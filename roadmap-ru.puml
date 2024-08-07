@@ -1,0 +1,96 @@
+@startmindmap
+* Teamlead Roadmap
+** Роли и обязанности
+***_ Administrator
+****_ Построение цикла разработки
+*****_ [[https://tlroadmap.io/roles/administrator/development-cycle/task-inbox.html Получение задач]]
+*****_ Выпуск задач
+******_ Приёмка
+******_ Раскатка
+****_ [[https://tlroadmap.io/roles/administrator/stakeholding.html Стейкхолдинг *]]
+***_ Integrator
+****_ [[https://tlroadmap.io/roles/integrator/business-knowledge.html Знание бизнеса]]
+****_ [[https://tlroadmap.io/roles/integrator/company-structure.html Структура компании]]
+****_ [[https://tlroadmap.io/roles/integrator/corporate-culture.html *Корпоративная культура + инженерная культура]]
+***_ People Manager
+****_ Управление людьми
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/admin.html Административная работа]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/delegation.html Делегирование]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/development.html Развитие]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/feedback.html Обратная связь]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/firing.html Увольнение]]
+*****_ Найм
+******_ [[https://tlroadmap.io/roles/people-manager/people-management/hiring/interview.html Собеседования]]
+******_ [[https://tlroadmap.io/roles/people-manager/people-management/hiring/onboarding.html Onboarding]]
+******_ [[https://tlroadmap.io/roles/people-manager/people-management/hiring/profile.html Профиль кандидата]]
+******_ [[https://tlroadmap.io/roles/people-manager/people-management/hiring/test-period.html Тестовый период]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/motivation.html Мотивация]]
+*****_ [[https://tlroadmap.io/roles/people-manager/people-management/one-on-one.html One-on-one]]
+****_ Управление командой
+*****_ [[https://tlroadmap.io/roles/people-manager/team-management/team-climate.html Климат в команде]]
+*****_ [[https://tlroadmap.io/roles/people-manager/team-management/team-maturity.html Зрелость команды *]]
+*****_ [[https://tlroadmap.io/roles/people-manager/team-management/transparency.html Обеспечение прозрачности]]
+***_ Product Owner
+****_ [[https://tlroadmap.io/roles/product-owner/product-decisions.html Принятие продуктовых решений]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-decisions/goal-setting.html Целеполагание *]]
+*****_ Управление продуктовым бэклогом
+******_ [[https://tlroadmap.io/roles/product-owner/product-decisions/product-backlog-management/backlog-prioritization.html Приоритизация бэклога]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-decisions/roadmap-management.html Управление роадмапом]]
+****_ [[https://tlroadmap.io/roles/product-owner/product-management.html Управление продуктом]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-management/feature-lifecycle.html Жизненный цикл фичей]]
+****_ [[https://tlroadmap.io/roles/product-owner/product-understanding.html Понимание продукта]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-understanding/market-knowledge.html Знание рынка]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-understanding/product-knowledge.html Знание продукта]]
+*****_ [[https://tlroadmap.io/roles/product-owner/product-understanding/user-knowledge.html Знание пользователей]]
+***_ Technical Lead
+****_ Архитектура
+*****_ Архитектурное ревью
+*****_ Проектирование
+*****_ Эволюция
+*****_ Сбор технических требований
+****_ Автоматизация цикла разработки
+*****_ [[https://tlroadmap.io/roles/technical-lead/automation/ci.html Continuous Integration]]
+*****_ Автоматизация релизов
+*****_ [[https://tlroadmap.io/roles/technical-lead/automation/vcs.html Работа с системами контроля версий(TBSпроверить есть или нет)]]
+****_ Capacity Management
+****_ Управление знаниями
+*****_ [[https://tlroadmap.io/roles/technical-lead/knowledge-management/documentation.html Техническая документация]]
+*****_ [[https://tlroadmap.io/roles/technical-lead/knowledge-management/knowledge-management.html Распространение знаний]]
+****_ Обеспечение качества продукта
+*****_ [[https://tlroadmap.io/roles/technical-lead/product-quality/bugs.html Работа с багами]]
+*****_ [[https://tlroadmap.io/roles/technical-lead/product-quality/code-review.html Code review]]
+*****_ [[https://tlroadmap.io/roles/technical-lead/product-quality/incident-management.html Управление инцидентами]]
+*****_ Метрики и мониторинг
+*****_ [[https://tlroadmap.io/roles/technical-lead/product-quality/nfr.html Нефункциональные требования]]
+*****_ Тестирование - вспомнить все
+******_ Нефункциональное тестирование
+******_ [[https://tlroadmap.io/roles/technical-lead/product-quality/testing/test-design.html Тест-дизайн]]
+******_ [[https://tlroadmap.io/roles/technical-lead/product-quality/testing/test-optimization.html Оптимизация количества тестирования]]
+******_ Планирование тестирования
+******_ [[https://tlroadmap.io/roles/technical-lead/product-quality/testing/test-pyramid.html Пирамида тестирования]]
+*******_ Автоматизация тестирования API
+*******_ Автоматизация тестирования GUI
+*******_ [[https://tlroadmap.io/roles/technical-lead/product-quality/testing/test-pyramid/unit-testing.html Unit-тестирование]]
+******_ [[https://tlroadmap.io/roles/technical-lead/product-quality/testing/testing-requirements.html Тестирование требований]]
+****_ Обеспечение технического качества
+*****_ [[https://tlroadmap.io/roles/technical-lead/tech-quality/technical-debt.html Управление техническим долгом]]
+left side
+** Личные навыки
+***_ Коммуникации
+****_ [[https://tlroadmap.io/self-skills/communications/coaching.html Коучинг]]
+****_ [[https://tlroadmap.io/self-skills/communications/cooperation.html Сотрудничество]]
+****_ [[https://tlroadmap.io/self-skills/communications/feedback.html Дача и получение обратной связи]]
+****_ [[https://tlroadmap.io/self-skills/communications/networking.html Нетворкинг]]
+***_ Стили менеджмента
+***_ Отношения
+****_ [[https://tlroadmap.io/self-skills/relationship/emotional-intelligence.html Эмоциональный интеллект]]
+***_ Развитие себя
+****_ [[https://tlroadmap.io/self-skills/self-development/reflection.html Рефлексия]]
+***_ Мышление
+****_ [[https://tlroadmap.io/self-skills/thinking/decision-making.html Принятие решений]]
+****_ [[https://tlroadmap.io/self-skills/thinking/strategic-vision.html Стратегическое видение]]
+***_ Тайм-менеджмент
+****_ [[https://tlroadmap.io/self-skills/time-management/goal-setting.html Постановка личных целей]]
+****_ [[https://tlroadmap.io/self-skills/time-management/prioritization.html Управление приоритетами]]
+****_ [[https://tlroadmap.io/self-skills/time-management/time-management.html Управление временем]]
+@endmindmap
