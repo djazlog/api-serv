@@ -4,9 +4,11 @@ go 1.23rc1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/fatih/color v1.17.0
 	github.com/jackc/pgx/v4 v4.18.3
+	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.8.1
+	github.com/rs/zerolog v1.15.0
 	golang.org/x/net v0.21.0
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.33.0
