@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/joho/godotenv v1.5.1
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.15.0
 	golang.org/x/net v0.21.0
 	google.golang.org/grpc v1.57.0
@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/georgysavva/scany v1.2.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
