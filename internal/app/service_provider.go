@@ -6,7 +6,7 @@ import (
 	"week/internal/api/note"
 	"week/internal/client/db"
 	"week/internal/client/db/pg"
-	"week/internal/client/db/transactions"
+	"week/internal/client/db/transaction"
 	"week/internal/closer"
 	"week/internal/config"
 	"week/internal/repository"
@@ -31,7 +31,7 @@ func NewServiceProvider() *ServiceProvider {
 	return &ServiceProvider{}
 }
 
-func (s *ServiceProvider) GetPGConfig() config.PGConfig {
+func (s *ServiceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := config.NewPGConfig()
 		if err != nil {
@@ -42,9 +42,9 @@ func (s *ServiceProvider) GetPGConfig() config.PGConfig {
 	return s.pgConfig
 }
 
-func (s *ServiceProvider) GetPgPool(ctx context.Context) db.Client {
+func (s *ServiceProvider) PgPool(ctx context.Context) db.Client {
 	if s.dbClient == nil {
-		cl, err := pg.New(ctx, s.GetPGConfig().DSN())
+		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -58,7 +58,7 @@ func (s *ServiceProvider) GetPgPool(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
-func (s *ServiceProvider) GetGRPCConfig() config.GRPCConfig {
+func (s *ServiceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := config.NewGRPCConfig()
 		if err != nil {
@@ -71,7 +71,7 @@ func (s *ServiceProvider) GetGRPCConfig() config.GRPCConfig {
 
 func (s *ServiceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
-		cl, err := pg.New(ctx, s.GetPGConfig().DSN())
+		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
 			log.Fatalf("failed to create db client: %v", err)
 		}
@@ -90,7 +90,7 @@ func (s *ServiceProvider) DBClient(ctx context.Context) db.Client {
 
 func (s *ServiceProvider) TxManager(ctx context.Context) db.TxManager {
 	if s.txManager == nil {
-		s.txManager = transactions.NewTransactionManager(s.DBClient(ctx).DB())
+		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
 	}
 
 	return s.txManager
@@ -98,7 +98,7 @@ func (s *ServiceProvider) TxManager(ctx context.Context) db.TxManager {
 
 func (s *ServiceProvider) GetNoteRepository(ctx context.Context) repository.NoteRepository {
 	if s.noteRepository == nil {
-		s.noteRepository = noteRepository.NewRepository(s.GetPgPool(ctx))
+		s.noteRepository = noteRepository.NewRepository(s.PgPool(ctx))
 	}
 	return s.noteRepository
 }

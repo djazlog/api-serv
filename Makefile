@@ -1,3 +1,4 @@
+include .env
 LOCAL_BIN:=$(CURDIR)/bin
 
 install-deps:
