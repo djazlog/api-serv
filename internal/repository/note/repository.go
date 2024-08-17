@@ -3,6 +3,7 @@ package note
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
+	"week/internal/client/db"
 	"week/internal/model"
 	"week/internal/repository"
 	"week/internal/repository/note/converter"
@@ -45,7 +46,7 @@ func (r *repo) Create(ctx context.Context, info *model.NoteInfo) (int64, error) 
 	}
 
 	var id int64
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
+	err = r.db.DB().QueryRawContext(ctx, q, args...).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -71,7 +72,7 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.Note, error) {
 	}
 
 	var note modelRepo.Note
-	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&note.ID, &note.Info.Title, &note.Info.Content, &note.CreatedAt, &note.UpdatedAt)
+	err = r.db.DB().ScanOneContext(ctx, &note, q, args...)
 	if err != nil {
 		return nil, err
 	}

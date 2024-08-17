@@ -16,6 +16,17 @@ type Query struct {
 	QueryRaw string
 }
 
+type Transactor interface {
+	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
+}
+
+// Handler - функция, которая выполняется в транзакции
+type Handler func(ctx context.Context) error
+
+type TxManager interface {
+	ReadCommited(ctx context.Context, f Handler) error
+}
+
 type SQLExecer interface {
 	NamedExecer
 	QueryExecer
