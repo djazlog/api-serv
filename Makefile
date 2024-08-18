@@ -43,3 +43,19 @@ local-migration-up:
 
 local-migration-down:
 	$(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${PG_DSN} down -v
+
+
+
+test:
+	go clean -testcache
+	go test ./... -covermode count -coverpkg=tests/internal/service/...,github.com/olezhek28/microservices_course/week_4/tests/internal/api/... -count 5
+
+
+test-coverage:
+	go clean -testcache
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=tests/internal/service/...,tests/internal/api/... -count 5
+	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out;
+	go tool cover -func=./coverage.out | grep "total";
+	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
