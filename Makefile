@@ -48,12 +48,12 @@ local-migration-down:
 
 test:
 	go clean -testcache
-	go test ./... -covermode count -coverpkg=tests/internal/service/...,github.com/olezhek28/microservices_course/week_4/tests/internal/api/... -count 5
+	go test ./... -covermode count -coverpkg=week/internal/service/...,week/internal/api/... -count 5
 
-
+# Показывает процент теста
 test-coverage:
 	go clean -testcache
-	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=tests/internal/service/...,tests/internal/api/... -count 5
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=week/internal/service/...,week/internal/api/... -count 5
 	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
 	rm coverage.tmp.out
 	go tool cover -html=coverage.out;
