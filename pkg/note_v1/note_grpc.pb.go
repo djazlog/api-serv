@@ -26,8 +26,8 @@ type NoteV1Client interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
-	Update(ctx context.Context, in *UpdatedRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	Delete(ctx context.Context, in *DeletedRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type noteV1Client struct {
@@ -65,7 +65,7 @@ func (c *noteV1Client) List(ctx context.Context, in *ListRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *noteV1Client) Update(ctx context.Context, in *UpdatedRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *noteV1Client) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/note_v1.NoteV1/Update", in, out, opts...)
 	if err != nil {
@@ -74,7 +74,7 @@ func (c *noteV1Client) Update(ctx context.Context, in *UpdatedRequest, opts ...g
 	return out, nil
 }
 
-func (c *noteV1Client) Delete(ctx context.Context, in *DeletedRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *noteV1Client) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/note_v1.NoteV1/Delete", in, out, opts...)
 	if err != nil {
@@ -90,8 +90,8 @@ type NoteV1Server interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	List(context.Context, *ListRequest) (*ListResponse, error)
-	Update(context.Context, *UpdatedRequest) (*emptypb.Empty, error)
-	Delete(context.Context, *DeletedRequest) (*emptypb.Empty, error)
+	Update(context.Context, *UpdateRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNoteV1Server()
 }
 
@@ -108,10 +108,10 @@ func (UnimplementedNoteV1Server) Get(context.Context, *GetRequest) (*GetResponse
 func (UnimplementedNoteV1Server) List(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedNoteV1Server) Update(context.Context, *UpdatedRequest) (*emptypb.Empty, error) {
+func (UnimplementedNoteV1Server) Update(context.Context, *UpdateRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedNoteV1Server) Delete(context.Context, *DeletedRequest) (*emptypb.Empty, error) {
+func (UnimplementedNoteV1Server) Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedNoteV1Server) mustEmbedUnimplementedNoteV1Server() {}
@@ -182,7 +182,7 @@ func _NoteV1_List_Handler(srv interface{}, ctx context.Context, dec func(interfa
 }
 
 func _NoteV1_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdatedRequest)
+	in := new(UpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -194,13 +194,13 @@ func _NoteV1_Update_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/note_v1.NoteV1/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NoteV1Server).Update(ctx, req.(*UpdatedRequest))
+		return srv.(NoteV1Server).Update(ctx, req.(*UpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _NoteV1_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeletedRequest)
+	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func _NoteV1_Delete_Handler(srv interface{}, ctx context.Context, dec func(inter
 		FullMethod: "/note_v1.NoteV1/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NoteV1Server).Delete(ctx, req.(*DeletedRequest))
+		return srv.(NoteV1Server).Delete(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

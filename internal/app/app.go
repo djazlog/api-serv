@@ -9,6 +9,7 @@ import (
 	"net"
 	"week/internal/closer"
 	"week/internal/config"
+	"week/internal/interceptor"
 	desc "week/pkg/note_v1"
 )
 
@@ -66,7 +67,10 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+	)
 
 	reflection.Register(a.grpcServer)
 

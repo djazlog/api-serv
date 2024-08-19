@@ -1,6 +1,17 @@
 package tests
 
-/*
+import (
+	"context"
+	"fmt"
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/gojuno/minimock/v3"
+	"github.com/stretchr/testify/require"
+	"testing"
+	"week/internal/repository"
+	repoMocks "week/internal/repository/mocks"
+	"week/internal/service/note"
+)
+
 func TestCreate(t *testing.T) {
 	t.Parallel()
 	type noteRepositoryMockFunc func(mc *minimock.Controller) repository.NoteRepository
@@ -78,4 +89,3 @@ func TestCreate(t *testing.T) {
 		})
 	}
 }
-*/
