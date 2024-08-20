@@ -7,6 +7,7 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"week/internal/model"
 	"week/internal/repository"
 	repoMocks "week/internal/repository/mocks"
 	"week/internal/service/note"

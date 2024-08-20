@@ -119,6 +119,7 @@
     },
     "/note/v1/create": {
       "post": {
+        "summary": "Создает новую заметку",
         "operationId": "NoteV1_Create",
         "responses": {
           "200": {
@@ -250,10 +251,12 @@
       "type": "object",
       "properties": {
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "Название заметки"
         },
         "content": {
-          "type": "string"
+          "type": "string",
+          "title": "Текст заметки"
         },
         "author": {
           "type": "string"

@@ -31,7 +31,9 @@ type NoteInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Title    string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// Название заметки
+	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// Текст заметки
 	Content  string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
 	Author   string `protobuf:"bytes,3,opt,name=author,proto3" json:"author,omitempty"`
 	IsPublic bool   `protobuf:"varint,4,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`

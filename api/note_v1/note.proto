@@ -29,6 +29,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service NoteV1 {
+  // Создает новую заметку
   rpc Create(CreateRequest) returns (CreateResponse){
     option (google.api.http) = {
       post: "/note/v1/create"
@@ -63,7 +64,9 @@ service NoteV1 {
 }
 
 message NoteInfo {
+  // Название заметки
   string title = 1 [(validate.rules).string = {min_len: 1 , max_len: 50}];
+  // Текст заметки
   string content = 2;
   string author = 3;
   bool is_public = 4;
