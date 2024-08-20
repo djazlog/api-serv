@@ -18,7 +18,9 @@ get-deps:
 
 
 generate:
+	mkdir -p pkg/swagger
 	make generate-note-api
+	$(LOCAL_BIN)/statik -src=pkg/swagger/ -include='*.css,*.html,*.js,*.json,*.png'
 
 generate-note-api:
 	mkdir -p pkg/note_v1
