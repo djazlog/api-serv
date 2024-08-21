@@ -4,20 +4,25 @@ import (
 	"github.com/fatih/color"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"time"
 	desc "week/pkg/note_v1"
 )
 
 const (
-	address = "localhost:50051"
-	noteID  = 12
+	address = "localhost:50052"
+	noteID  = 2
 )
 
 func main() {
 
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	creds, err := credentials.NewClientTLSFromFile("serts/service.pem", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("failed to connect to server: %v", err)
 	}
