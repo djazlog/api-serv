@@ -1,4 +1,5 @@
 /bin/
 /coverage.out
 /vendor.protogen
+*.pb.go
 

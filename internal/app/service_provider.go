@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log"
+	//"week/internal/api/auth"
 	"week/internal/api/note"
 	"week/internal/client/db"
 	"week/internal/client/db/pg"
@@ -146,3 +147,19 @@ func (s *ServiceProvider) GetNoteImpl(ctx context.Context) *note.Implementation 
 
 	return s.noteImpl
 }
+
+/*
+func (s *ServiceProvider) GetAuthImpl(ctx context.Context) *auth.Implementation {
+	if s.noteImpl == nil {
+		s.noteImpl = note.NewImplementation(s.GetNoteService(ctx))
+	}
+
+	return s.noteImpl
+}
+func (s *ServiceProvider) GetAccessImpl(ctx context.Context) *auth.Implementation {
+	if s.noteImpl == nil {
+		s.noteImpl = note.NewImplementation(s.GetNoteService(ctx))
+	}
+
+	return s.noteImpl
+}*/

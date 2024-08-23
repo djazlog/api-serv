@@ -2,10 +2,15 @@ package app
 
 import (
 	"context"
+	"flag"
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/natefinch/lumberjack"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,13 +18,17 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 	"week/internal/closer"
 	"week/internal/config"
 	"week/internal/interceptor"
+	"week/internal/logger"
 	desc "week/pkg/note_v1"
 	_ "week/statik"
 )
+
+var logLevel = flag.String("l", "info", "log level")
 
 type App struct {
 	serviceProvider *ServiceProvider
@@ -110,15 +119,23 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	logger.InitLogger(getCore(getAtomicLevel()))
 
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(creds),
-		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.LoggerInterceptor,
+				interceptor.ValidateInterceptor,
+			),
+		),
 	)
 
 	reflection.Register(a.grpcServer)
 
 	desc.RegisterNoteV1Server(a.grpcServer, a.serviceProvider.GetNoteImpl(ctx))
+	//descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.GetAuthImpl(ctx))
+	//descAccess.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.GetAccessImpl(ctx))
 	return nil
 }
 func (a *App) initHTTPServer(ctx context.Context) error {
@@ -237,4 +254,39 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 
 		log.Printf("Served swagger file: %s", path)
 	}
+}
+
+func getCore(level zap.AtomicLevel) zapcore.Core {
+	stdout := zapcore.AddSync(os.Stdout)
+
+	file := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "logs/app.log",
+		MaxSize:    10, // megabytes
+		MaxBackups: 3,
+		MaxAge:     7, // days
+	})
+
+	productionCfg := zap.NewProductionEncoderConfig()
+	productionCfg.TimeKey = "timestamp"
+	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	developmentCfg := zap.NewDevelopmentEncoderConfig()
+	developmentCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	consoleEncoder := zapcore.NewConsoleEncoder(developmentCfg)
+	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
+
+	return zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, stdout, level),
+		zapcore.NewCore(fileEncoder, file, level),
+	)
+}
+
+func getAtomicLevel() zap.AtomicLevel {
+	var level zapcore.Level
+	if err := level.Set(*logLevel); err != nil {
+		log.Fatal()
+	}
+
+	return zap.NewAtomicLevelAt(level)
 }
