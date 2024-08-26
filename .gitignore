@@ -3,3 +3,4 @@
 /vendor.protogen
 *.pb.go
 
+/tmp/

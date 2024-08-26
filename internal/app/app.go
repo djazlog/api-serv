@@ -6,13 +6,16 @@ import (
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/natefinch/lumberjack"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rakyll/statik/fs"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	"week/internal/metrics"
+
+	//"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"io"
@@ -31,10 +34,11 @@ import (
 var logLevel = flag.String("l", "info", "log level")
 
 type App struct {
-	serviceProvider *ServiceProvider
-	grpcServer      *grpc.Server
-	httpServer      *http.Server
-	swaggerServer   *http.Server
+	serviceProvider  *ServiceProvider
+	grpcServer       *grpc.Server
+	httpServer       *http.Server
+	prometheusServer *http.Server
+	swaggerServer    *http.Server
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -67,7 +71,14 @@ func (a *App) Run() error {
 		defer wg.Done()
 		err := a.runHTTPServer()
 		if err != nil {
-			log.Error().Err(err).Msg("grpc server failed")
+			log.Error().Err(err).Msg("http server failed")
+		}
+	}() // HTTP Сервер
+	go func() {
+		defer wg.Done()
+		err := a.runPrometheusServer()
+		if err != nil {
+			log.Error().Err(err).Msg("runPrometheus server failed")
 		}
 	}()
 	go func() {
@@ -89,6 +100,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initServiceProvider,
 		a.initGRPCServer,
 		a.initHTTPServer,
+		a.initHTTPPrometheusServer,
 		a.initSwaggerServer,
 	}
 
@@ -115,16 +127,21 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	creds, err := credentials.NewServerTLSFromFile("serts/service.pem", "serts/service.key")
+	/*creds, err := credentials.NewServerTLSFromFile("serts/service.pem", "serts/service.key")
+	if err != nil {
+		return err
+	}*/
+	err := metrics.Init(ctx)
 	if err != nil {
 		return err
 	}
 	logger.InitLogger(getCore(getAtomicLevel()))
 
 	a.grpcServer = grpc.NewServer(
-		grpc.Creds(creds),
+		//grpc.Creds(creds),
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
+				interceptor.MetricsInterceptor,
 				interceptor.LoggerInterceptor,
 				interceptor.ValidateInterceptor,
 			),
@@ -138,6 +155,20 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	//descAccess.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.GetAccessImpl(ctx))
 	return nil
 }
+func (a *App) initHTTPPrometheusServer(ctx context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	a.prometheusServer = &http.Server{
+		Addr:    "localhost:2112",
+		Handler: mux,
+	}
+
+	log.Printf("Prometheus server is running on %s", "localhost:2112")
+
+	return nil
+}
+
 func (a *App) initHTTPServer(ctx context.Context) error {
 	mux := runtime.NewServeMux()
 
@@ -201,6 +232,15 @@ func (a *App) runHTTPServer() error {
 	log.Printf("starting HTTP server on #{a.serviceProvider.HTTPConfig().Address()}")
 
 	err := a.httpServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a *App) runPrometheusServer() error {
+	log.Printf("starting HTTP server on #{a.serviceProvider.HTTPConfig().Address()}")
+
+	err := a.prometheusServer.ListenAndServe()
 	if err != nil {
 		return err
 	}

@@ -120,3 +120,23 @@ gen-cert:
 	openssl req -new -key serts/service.key -out serts/service.csr -config serts/certificate.conf
 	openssl x509 -req -in serts/service.csr -CA serts/ca.cert -CAkey serts/ca.key -CAcreateserial \
     		-out serts/service.pem -days 365 -sha256 -extfile serts/certificate.conf -extensions req_ext
+# Нагрузочный тест
+grpc-load-test:
+	ghz \
+		--proto api/note_v1/note_e.proto \
+		--call note_v1.NoteV1.Get \
+		--data '{"id": 1}' \
+		--rps 100 \
+		--total 3000 \
+		--insecure \
+		localhost:50052
+
+grpc-error-load-test:
+	ghz \
+		--proto api/note_v1/note_e.proto \
+		--call note_v1.NoteV1.Get \
+		--data '{"id": 0}' \
+		--rps 100 \
+		--total 3000 \
+		--insecure \
+		localhost:50052
