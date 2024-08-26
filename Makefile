@@ -140,3 +140,7 @@ grpc-error-load-test:
 		--total 3000 \
 		--insecure \
 		localhost:50052
+
+# Нагрузочный тест через wrk
+#load-test:
+#	wrk -t12 -c400 -d30s -s ./load_tests/test.lua --latency http://localhost:80/link-shortener/v1/long-link/get

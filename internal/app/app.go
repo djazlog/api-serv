@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"week/internal/metrics"
+	"week/internal/tracing"
 
 	//"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -131,17 +132,24 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	if err != nil {
 		return err
 	}*/
+
 	err := metrics.Init(ctx)
 	if err != nil {
 		return err
 	}
 	logger.InitLogger(getCore(getAtomicLevel()))
 
+	err = tracing.Init("app")
+	if err != nil {
+		return err
+	}
+
 	a.grpcServer = grpc.NewServer(
 		//grpc.Creds(creds),
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
 				interceptor.MetricsInterceptor,
+				interceptor.ServerTracingInterceptor,
 				interceptor.LoggerInterceptor,
 				interceptor.ValidateInterceptor,
 			),
