@@ -1,4 +1,4 @@
-package note
+package pg
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"week/internal/client/db"
 	"week/internal/model"
 	"week/internal/repository"
-	"week/internal/repository/note/converter"
-	modelRepo "week/internal/repository/note/model"
+	"week/internal/repository/note/pg/converter"
+	modelRepo "week/internal/repository/note/pg/model"
 )
 
 const (

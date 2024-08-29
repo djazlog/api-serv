@@ -1,4 +1,4 @@
-package config
+package env
 
 import (
 	"fmt"
@@ -11,10 +11,6 @@ const (
 	swaggerPortEnvName = "SWAGGER_PORT"
 )
 
-type SwaggerConfig interface {
-	Address() string
-}
-
 type swaggerConfig struct {
 	host string
 	port string
@@ -24,7 +20,7 @@ func (cfg swaggerConfig) Address() string {
 	return net.JoinHostPort(cfg.host, cfg.port)
 }
 
-func NewSwaggerConfig() (SwaggerConfig, error) {
+func NewSwaggerConfig() (*swaggerConfig, error) {
 	host := os.Getenv(swaggerHostEnvName)
 	if len(host) == 0 {
 		return nil, fmt.Errorf("environment variable %s is not set", swaggerHostEnvName)

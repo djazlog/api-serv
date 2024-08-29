@@ -2,25 +2,36 @@ package app
 
 import (
 	"context"
+	redigo "github.com/gomodule/redigo/redis"
 	"log"
+	"week/internal/client/cache"
+	"week/internal/client/cache/redis"
+	"week/internal/config"
+	"week/internal/config/env"
+
 	//"week/internal/api/auth"
 	"week/internal/api/note"
 	"week/internal/client/db"
 	"week/internal/client/db/pg"
 	"week/internal/client/db/transaction"
 	"week/internal/closer"
-	"week/internal/config"
 	"week/internal/repository"
-	noteRepository "week/internal/repository/note"
+	noteRepositoryPg "week/internal/repository/note/pg"
+	noteRepositoryRedis "week/internal/repository/note/redis"
 	"week/internal/service"
 	noteService "week/internal/service/note"
 )
 
-type ServiceProvider struct {
+type serviceProvider struct {
 	pgConfig      config.PGConfig
 	grpcConfig    config.GRPCConfig
 	httpConfig    config.HTTPConfig
 	swaggerConfig config.SwaggerConfig
+
+	redisConfig   config.RedisConfig
+	storageConfig config.StorageConfig
+	redisPool     *redigo.Pool
+	redisClient   cache.RedisClient
 
 	dbClient       db.Client
 	txManager      db.TxManager
@@ -30,13 +41,13 @@ type ServiceProvider struct {
 	noteImpl *note.Implementation
 }
 
-func NewServiceProvider() *ServiceProvider {
-	return &ServiceProvider{}
+func newServiceProvider() *serviceProvider {
+	return &serviceProvider{}
 }
 
-func (s *ServiceProvider) PGConfig() config.PGConfig {
+func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
-		cfg, err := config.NewPGConfig()
+		cfg, err := env.NewPGConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -45,7 +56,7 @@ func (s *ServiceProvider) PGConfig() config.PGConfig {
 	return s.pgConfig
 }
 
-func (s *ServiceProvider) PgPool(ctx context.Context) db.Client {
+func (s *serviceProvider) PgPool(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
@@ -61,9 +72,9 @@ func (s *ServiceProvider) PgPool(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
-func (s *ServiceProvider) GRPCConfig() config.GRPCConfig {
+func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
-		cfg, err := config.NewGRPCConfig()
+		cfg, err := env.NewGRPCConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -71,9 +82,9 @@ func (s *ServiceProvider) GRPCConfig() config.GRPCConfig {
 	}
 	return s.grpcConfig
 }
-func (s *ServiceProvider) HTTPConfig() config.HTTPConfig {
+func (s *serviceProvider) HTTPConfig() config.HTTPConfig {
 	if s.httpConfig == nil {
-		cfg, err := config.NewHTTPConfig()
+		cfg, err := env.NewHTTPConfig()
 		if err != nil {
 			log.Fatalf("failed to get http config: %s", err.Error())
 		}
@@ -84,9 +95,9 @@ func (s *ServiceProvider) HTTPConfig() config.HTTPConfig {
 	return s.httpConfig
 }
 
-func (s *ServiceProvider) SwaggerConfig() config.SwaggerConfig {
+func (s *serviceProvider) SwaggerConfig() config.SwaggerConfig {
 	if s.swaggerConfig == nil {
-		cfg, err := config.NewSwaggerConfig()
+		cfg, err := env.NewSwaggerConfig()
 		if err != nil {
 			log.Fatalf("failed to get swagger config: %s", err.Error())
 		}
@@ -97,7 +108,33 @@ func (s *ServiceProvider) SwaggerConfig() config.SwaggerConfig {
 	return s.swaggerConfig
 }
 
-func (s *ServiceProvider) DBClient(ctx context.Context) db.Client {
+func (s *serviceProvider) RedisConfig() config.RedisConfig {
+	if s.redisConfig == nil {
+		cfg, err := env.NewRedisConfig()
+		if err != nil {
+			log.Fatalf("failed to get redis config: %s", err.Error())
+		}
+
+		s.redisConfig = cfg
+	}
+
+	return s.redisConfig
+}
+
+func (s *serviceProvider) StorageConfig() config.StorageConfig {
+	if s.storageConfig == nil {
+		cfg, err := env.NewStorageConfig()
+		if err != nil {
+			log.Fatalf("failed to get storage config: %s", err.Error())
+		}
+
+		s.storageConfig = cfg
+	}
+
+	return s.storageConfig
+}
+
+func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
@@ -116,7 +153,7 @@ func (s *ServiceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
-func (s *ServiceProvider) TxManager(ctx context.Context) db.TxManager {
+func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	if s.txManager == nil {
 		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
 	}
@@ -124,13 +161,43 @@ func (s *ServiceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
-func (s *ServiceProvider) GetNoteRepository(ctx context.Context) repository.NoteRepository {
+func (s *serviceProvider) RedisPool() *redigo.Pool {
+	if s.redisPool == nil {
+		s.redisPool = &redigo.Pool{
+			MaxIdle:     s.RedisConfig().MaxIdle(),
+			IdleTimeout: s.RedisConfig().IdleTimeout(),
+			DialContext: func(ctx context.Context) (redigo.Conn, error) {
+				return redigo.DialContext(ctx, "tcp", s.RedisConfig().Address())
+			},
+		}
+	}
+
+	return s.redisPool
+}
+
+func (s *serviceProvider) RedisClient() cache.RedisClient {
+	if s.redisClient == nil {
+		s.redisClient = redis.NewClient(s.RedisPool(), s.RedisConfig())
+	}
+
+	return s.redisClient
+}
+
+func (s *serviceProvider) GetNoteRepository(ctx context.Context) repository.NoteRepository {
 	if s.noteRepository == nil {
-		s.noteRepository = noteRepository.NewRepository(s.PgPool(ctx))
+		//s.noteRepository = noteRepository.NewRepository(s.PgPool(ctx))
+		stc := s.StorageConfig().Mode()
+
+		if stc == "redis" {
+			s.noteRepository = noteRepositoryRedis.NewRepository(s.RedisClient())
+		}
+		if stc == "pg" {
+			s.noteRepository = noteRepositoryPg.NewRepository(s.DBClient(ctx))
+		}
 	}
 	return s.noteRepository
 }
-func (s *ServiceProvider) GetNoteService(ctx context.Context) service.NoteService {
+func (s *serviceProvider) GetNoteService(ctx context.Context) service.NoteService {
 	if s.noteService == nil {
 		s.noteService = noteService.NewService(
 			s.GetNoteRepository(ctx),
@@ -140,7 +207,7 @@ func (s *ServiceProvider) GetNoteService(ctx context.Context) service.NoteServic
 	return s.noteService
 }
 
-func (s *ServiceProvider) GetNoteImpl(ctx context.Context) *note.Implementation {
+func (s *serviceProvider) GetNoteImpl(ctx context.Context) *note.Implementation {
 	if s.noteImpl == nil {
 		s.noteImpl = note.NewImplementation(s.GetNoteService(ctx))
 	}
@@ -149,14 +216,14 @@ func (s *ServiceProvider) GetNoteImpl(ctx context.Context) *note.Implementation 
 }
 
 /*
-func (s *ServiceProvider) GetAuthImpl(ctx context.Context) *auth.Implementation {
+func (s *serviceProvider) GetAuthImpl(ctx context.Context) *auth.Implementation {
 	if s.noteImpl == nil {
 		s.noteImpl = note.NewImplementation(s.GetNoteService(ctx))
 	}
 
 	return s.noteImpl
 }
-func (s *ServiceProvider) GetAccessImpl(ctx context.Context) *auth.Implementation {
+func (s *serviceProvider) GetAccessImpl(ctx context.Context) *auth.Implementation {
 	if s.noteImpl == nil {
 		s.noteImpl = note.NewImplementation(s.GetNoteService(ctx))
 	}

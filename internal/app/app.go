@@ -35,7 +35,7 @@ import (
 var logLevel = flag.String("l", "info", "log level")
 
 type App struct {
-	serviceProvider  *ServiceProvider
+	serviceProvider  *serviceProvider
 	grpcServer       *grpc.Server
 	httpServer       *http.Server
 	prometheusServer *http.Server
@@ -123,7 +123,7 @@ func (a *App) initConfig(_ context.Context) error {
 }
 
 func (a *App) initServiceProvider(_ context.Context) error {
-	a.serviceProvider = NewServiceProvider()
+	a.serviceProvider = newServiceProvider()
 	return nil
 }
 

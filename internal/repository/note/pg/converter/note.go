@@ -2,7 +2,7 @@ package converter
 
 import (
 	"week/internal/model"
-	modelRepo "week/internal/repository/note/model"
+	modelRepo "week/internal/repository/note/pg/model"
 )
 
 func ToNoteFromRepo(note *modelRepo.Note) *model.Note {
